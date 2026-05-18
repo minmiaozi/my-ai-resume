@@ -1,10 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/components/AuthProvider";
 import { getSession, setSession, type Session } from "@/lib/auth";
 
 export default function NavAuth() {
+  const { openAuth } = useAuth();
   const [session, setLocalSession] = useState<Session | null>(null);
 
   useEffect(() => {
@@ -33,13 +34,16 @@ export default function NavAuth() {
 
   return (
     <div className="nav-auth">
-      <Link href="/auth" className="nav-auth-btn">
+      <button type="button" className="nav-auth-btn" onClick={() => openAuth("login")}>
         Sign in
-      </Link>
-      <Link href="/auth?mode=register" className="nav-auth-btn nav-auth-btn-primary">
+      </button>
+      <button
+        type="button"
+        className="nav-auth-btn nav-auth-btn-primary"
+        onClick={() => openAuth("register")}
+      >
         Sign up
-      </Link>
+      </button>
     </div>
   );
 }
-

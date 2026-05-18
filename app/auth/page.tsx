@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import AuthForm from "@/components/AuthForm";
+import AuthPageClient from "./AuthPageClient";
 
 export default function AuthPage() {
   return (
@@ -10,7 +10,7 @@ export default function AuthPage() {
         </div>
       }
     >
-      <AuthForm />
+      <AuthPageClient />
     </Suspense>
   );
 }

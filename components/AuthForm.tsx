@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   SMS_COOLDOWN_SEC,
@@ -21,12 +21,21 @@ import {
 } from "@/lib/auth";
 import { fetchPublicConfig } from "@/lib/billing";
 
-export default function AuthForm() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const initialMode = searchParams.get("mode") === "register" ? "register" : "login";
+export type AuthFormProps = {
+  initialMode?: AuthMode;
+  onClose?: () => void;
+  /** When false, stay on current page after sign-in (modal). Default true. */
+  redirectOnSuccess?: boolean;
+};
 
-  const [mode, setMode] = useState<AuthMode>(initialMode);
+export default function AuthForm({
+  initialMode: initialModeProp = "login",
+  onClose,
+  redirectOnSuccess = true,
+}: AuthFormProps) {
+  const router = useRouter();
+
+  const [mode, setMode] = useState<AuthMode>(initialModeProp);
   const [account, setAccount] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -42,6 +51,10 @@ export default function AuthForm() {
   const phoneMode = kind === "phone";
 
   useEffect(() => {
+    setMode(initialModeProp);
+  }, [initialModeProp]);
+
+  useEffect(() => {
     fetchPublicConfig().then((c) => {
       if (typeof c.googleClientId === "string") setGoogleClientId(c.googleClientId);
     });
@@ -49,6 +62,11 @@ export default function AuthForm() {
       if (smsTimer.current) clearInterval(smsTimer.current);
     };
   }, []);
+
+  const finishAuth = useCallback(() => {
+    onClose?.();
+    if (redirectOnSuccess) router.push("/");
+  }, [onClose, redirectOnSuccess, router]);
 
   const clearErrors = useCallback(() => {
     setFormError("");
@@ -86,7 +104,7 @@ export default function AuthForm() {
       identifier: email,
       displayName: profile.name || email.split("@")[0],
     });
-    router.push("/");
+    finishAuth();
   };
 
   const signInWithGoogle = async () => {
@@ -251,7 +269,7 @@ export default function AuthForm() {
       }
     }
 
-    router.push("/");
+    finishAuth();
   };
 
   const isRegister = mode === "register";
@@ -259,19 +277,35 @@ export default function AuthForm() {
   const showConfirm = isRegister && showPassword;
 
   return (
-    <div className="auth-page">
-      <div className={`auth-card${isRegister ? " is-register" : ""}`}>
-        <div className="auth-header">
-          <h1 className="auth-title">{isRegister ? "Sign up" : "Sign in"}</h1>
-          <Link href="/" className="auth-brand">
-            <span className="auth-brand-icon" aria-hidden>
-              ⚡
-            </span>
-            <span className="auth-brand-name">ResumeAIPro</span>
-          </Link>
-        </div>
+    <div className={`auth-card${isRegister ? " is-register" : ""}`}>
+      {onClose ? (
+        <button type="button" className="auth-close" onClick={onClose} aria-label="Close">
+          ×
+        </button>
+      ) : null}
 
-        <button
+      <div className="auth-header">
+        <h1 className="auth-title" id="authTitle">
+          {isRegister ? "Sign up" : "Sign in"}
+        </h1>
+        <Link
+          href="/"
+          className="auth-brand"
+          onClick={(e) => {
+            if (onClose) {
+              e.preventDefault();
+              onClose();
+            }
+          }}
+        >
+          <span className="auth-brand-icon" aria-hidden>
+            ⚡
+          </span>
+          <span className="auth-brand-name">ResumeAIPro</span>
+        </Link>
+      </div>
+
+      <button
           type="button"
           className="auth-google-btn"
           onClick={() => void signInWithGoogle()}
@@ -401,7 +435,6 @@ export default function AuthForm() {
             </>
           )}
         </p>
-      </div>
     </div>
   );
 }

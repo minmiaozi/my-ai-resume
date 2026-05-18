@@ -988,7 +988,44 @@
       border: 1px solid #e2e8f0;
     }
 
-    /* ===== AUTH PAGE (/auth) ===== */
+    /* ===== AUTH MODAL & PAGE ===== */
+    .auth-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(15, 23, 42, 0.4);
+      backdrop-filter: blur(4px);
+    }
+
+    .auth-overlay.open {
+      display: flex;
+    }
+
+    .auth-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      font-size: 22px;
+      line-height: 1;
+      color: var(--text-light);
+      cursor: pointer;
+      border-radius: 8px;
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .auth-close:hover {
+      color: var(--text-dark);
+      background: #f1f5f9;
+    }
+
     .auth-page {
       min-height: 100vh;
       min-height: 100dvh;
