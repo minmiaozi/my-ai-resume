@@ -21,9 +21,6 @@ import {
 } from "@/lib/auth";
 import { fetchPublicConfig } from "@/lib/billing";
 
-const inputClass =
-  "w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-[15px] text-slate-900 shadow-sm transition placeholder:text-slate-400 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/20";
-
 export default function AuthForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -258,71 +255,55 @@ export default function AuthForm() {
   };
 
   const isRegister = mode === "register";
+  const showPassword = !(phoneMode && !isRegister);
+  const showConfirm = isRegister && showPassword;
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-slate-100">
-      <div
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,#0a192f_0%,#1e3a8a_50%,#1e40af_100%)]"
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_70%,rgba(245,158,11,0.22),transparent_50%)]"
-        aria-hidden
-      />
+    <div className="auth-page">
+      <div className={`auth-card${isRegister ? " is-register" : ""}`}>
+        <div className="auth-header">
+          <h1 className="auth-title">{isRegister ? "Sign up" : "Sign in"}</h1>
+          <Link href="/" className="auth-brand">
+            <span className="auth-brand-icon" aria-hidden>
+              ⚡
+            </span>
+            <span className="auth-brand-name">ResumeAIPro</span>
+          </Link>
+        </div>
 
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-md flex-col justify-center px-4 py-10">
-        <div className="rounded-2xl bg-white p-8 shadow-2xl shadow-slate-900/20">
-          <div className="mb-8 flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-slate-900">
-              {isRegister ? "Sign up" : "Sign in"}
-            </h1>
-            <Link href="/" className="flex items-center gap-2 text-sm font-bold text-slate-700">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[linear-gradient(135deg,#0a192f,#1e3a8a)] text-white">
-                ⚡
-              </span>
-              ResumeAIPro
-            </Link>
+        <button
+          type="button"
+          className="auth-google-btn"
+          onClick={() => void signInWithGoogle()}
+          disabled={submitting}
+        >
+          <GoogleIcon />
+          {isRegister ? "Sign up with Google" : "Continue with Google"}
+        </button>
+
+        <div className="auth-divider">or</div>
+
+        {formError ? <div className="auth-form-error">{formError}</div> : null}
+
+        <form className="auth-form" onSubmit={onSubmit} noValidate>
+          <div>
+            <input
+              className={`auth-input${fieldErrors.account ? " invalid" : ""}`}
+              placeholder="Email or phone number"
+              value={account}
+              onChange={(e) => setAccount(e.target.value)}
+              autoComplete="username"
+            />
+            {fieldErrors.account ? (
+              <p className="auth-field-error">{fieldErrors.account}</p>
+            ) : null}
           </div>
 
-          <button
-            type="button"
-            onClick={() => void signInWithGoogle()}
-            className="mb-6 flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 py-3 text-[15px] font-semibold text-slate-800 hover:bg-slate-50"
-          >
-            <GoogleIcon />
-            {isRegister ? "Sign up with Google" : "Continue with Google"}
-          </button>
-
-          <div className="mb-6 flex items-center gap-4 text-sm text-slate-400">
-            <span className="h-px flex-1 bg-slate-200" />
-            or
-            <span className="h-px flex-1 bg-slate-200" />
-          </div>
-
-          {formError ? (
-            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-              {formError}
-            </div>
-          ) : null}
-
-          <form onSubmit={onSubmit} className="space-y-4" noValidate>
+          {phoneMode ? (
             <div>
-              <input
-                className={`${inputClass} ${fieldErrors.account ? "border-red-400" : ""}`}
-                placeholder="Email or phone number"
-                value={account}
-                onChange={(e) => setAccount(e.target.value)}
-                autoComplete="username"
-              />
-              {fieldErrors.account ? (
-                <p className="mt-1 text-xs text-red-600">{fieldErrors.account}</p>
-              ) : null}
-            </div>
-
-            {phoneMode ? (
-              <div className="flex gap-2">
+              <div className="auth-code-row">
                 <input
-                  className={`${inputClass} flex-1 ${fieldErrors.phoneCode ? "border-red-400" : ""}`}
+                  className={`auth-input${fieldErrors.phoneCode ? " invalid" : ""}`}
                   placeholder="SMS code"
                   value={phoneCode}
                   onChange={(e) => setPhoneCode(e.target.value)}
@@ -331,99 +312,95 @@ export default function AuthForm() {
                 />
                 <button
                   type="button"
-                  className="shrink-0 rounded-xl border border-slate-200 px-4 text-sm font-semibold disabled:opacity-50"
+                  className="auth-code-btn"
                   onClick={sendSms}
                   disabled={smsLeft > 0}
                 >
                   {smsLeft > 0 ? `${smsLeft}s` : "Send code"}
                 </button>
               </div>
-            ) : null}
-            {fieldErrors.phoneCode ? (
-              <p className="text-xs text-red-600">{fieldErrors.phoneCode}</p>
-            ) : null}
+              {fieldErrors.phoneCode ? (
+                <p className="auth-field-error">{fieldErrors.phoneCode}</p>
+              ) : null}
+            </div>
+          ) : null}
 
-            {!(phoneMode && !isRegister) ? (
-              <div>
-                <input
-                  type="password"
-                  className={`${inputClass} ${fieldErrors.password ? "border-red-400" : ""}`}
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  autoComplete={isRegister ? "new-password" : "current-password"}
-                />
-                {fieldErrors.password ? (
-                  <p className="mt-1 text-xs text-red-600">{fieldErrors.password}</p>
-                ) : null}
-              </div>
-            ) : null}
+          {showPassword ? (
+            <div>
+              <input
+                type="password"
+                className={`auth-input${fieldErrors.password ? " invalid" : ""}`}
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete={isRegister ? "new-password" : "current-password"}
+              />
+              {fieldErrors.password ? (
+                <p className="auth-field-error">{fieldErrors.password}</p>
+              ) : null}
+            </div>
+          ) : null}
 
-            {isRegister && !(phoneMode && !isRegister) ? (
-              <div>
-                <input
-                  type="password"
-                  className={`${inputClass} ${fieldErrors.confirm ? "border-red-400" : ""}`}
-                  placeholder="Confirm password"
-                  value={confirm}
-                  onChange={(e) => setConfirm(e.target.value)}
-                  autoComplete="new-password"
-                />
-                {fieldErrors.confirm ? (
-                  <p className="mt-1 text-xs text-red-600">{fieldErrors.confirm}</p>
-                ) : null}
-              </div>
-            ) : null}
+          {showConfirm ? (
+            <div>
+              <input
+                type="password"
+                className={`auth-input${fieldErrors.confirm ? " invalid" : ""}`}
+                placeholder="Confirm password"
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
+                autoComplete="new-password"
+              />
+              {fieldErrors.confirm ? (
+                <p className="auth-field-error">{fieldErrors.confirm}</p>
+              ) : null}
+            </div>
+          ) : null}
 
-            <button
-              type="submit"
-              disabled={submitting}
-              className="w-full rounded-full bg-blue-600 py-3.5 text-[16px] font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
-            >
-              {isRegister ? "Sign up" : "Sign in"}
-            </button>
-          </form>
-
-          <button
-            type="button"
-            className="mt-4 block w-full text-center text-sm text-slate-600 hover:text-blue-600"
-            onClick={() => alert("Demo: sign in with Google, or contact support to reset your password.")}
-          >
-            Forgot your password?
+          <button type="submit" className="auth-submit" disabled={submitting}>
+            {isRegister ? "Sign up" : "Sign in"}
           </button>
+        </form>
 
-          <p className="mt-6 text-center text-sm text-slate-600">
-            {isRegister ? (
-              <>
-                Already have an account?{" "}
-                <button
-                  type="button"
-                  className="font-semibold text-blue-600"
-                  onClick={() => {
-                    setMode("login");
-                    clearErrors();
-                  }}
-                >
-                  Sign in
-                </button>
-              </>
-            ) : (
-              <>
-                Don&apos;t have an account?{" "}
-                <button
-                  type="button"
-                  className="font-semibold text-blue-600"
-                  onClick={() => {
-                    setMode("register");
-                    clearErrors();
-                  }}
-                >
-                  Sign up
-                </button>
-              </>
-            )}
-          </p>
-        </div>
+        <button
+          type="button"
+          className="auth-forgot"
+          onClick={() =>
+            alert("Demo: sign in with Google, or contact support to reset your password.")
+          }
+        >
+          Forgot your password?
+        </button>
+
+        <p className="auth-switch">
+          {isRegister ? (
+            <>
+              Already have an account?{" "}
+              <button
+                type="button"
+                onClick={() => {
+                  setMode("login");
+                  clearErrors();
+                }}
+              >
+                Sign in
+              </button>
+            </>
+          ) : (
+            <>
+              Don&apos;t have an account?{" "}
+              <button
+                type="button"
+                onClick={() => {
+                  setMode("register");
+                  clearErrors();
+                }}
+              >
+                Sign up
+              </button>
+            </>
+          )}
+        </p>
       </div>
     </div>
   );
