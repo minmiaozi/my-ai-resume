@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import NavAuth from "@/components/NavAuth";
+import { canGenerate, incrementUsage } from "@/lib/billing";
 import { assistantTextFromPayload } from "@/lib/completion";
 
 async function parseApiJson(res: Response): Promise<Record<string, unknown>> {
@@ -66,6 +68,12 @@ export default function Home() {
       return;
     }
 
+    const limit = canGenerate();
+    if (!limit.ok) {
+      alert(`${limit.message}\n\nUpgrade at /pricing`);
+      return;
+    }
+
     setBulletVisible(true);
     setBulletText("Generating optimized bullets...");
     if (mode === "primary") setBulletMainLoading(true);
@@ -101,6 +109,7 @@ export default function Home() {
         throw new Error("模型未返回正文（响应格式异常）");
       }
       setBulletText(text);
+      incrementUsage();
     } catch (err) {
       console.error(err);
       setBulletText("错误：" + (err instanceof Error ? err.message : String(err)));
@@ -115,6 +124,12 @@ export default function Home() {
     const skills = userSkills.trim();
     if (!company || !position || !skills) {
       alert("Please fill in all required fields");
+      return;
+    }
+
+    const limit = canGenerate();
+    if (!limit.ok) {
+      alert(`${limit.message}\n\nUpgrade at /pricing`);
       return;
     }
 
@@ -156,6 +171,7 @@ Candidate background and fit: ${skills}`,
         throw new Error("模型未返回正文（响应格式异常）");
       }
       setCoverText(text);
+      incrementUsage();
     } catch (err) {
       console.error(err);
       setCoverText("错误：" + (err instanceof Error ? err.message : String(err)));
@@ -186,15 +202,16 @@ Candidate background and fit: ${skills}`,
             <a href="#features" className="nav-link">
               Features
             </a>
-            <a href="#pricing" className="nav-link">
+            <Link href="/pricing" className="nav-link">
               Pricing
-            </a>
+            </Link>
             <a href="#blog" className="nav-link">
               Blog
             </a>
-            <a href="#pricing" className="nav-cta">
+            <NavAuth />
+            <Link href="/pricing" className="nav-cta">
               Get Pro →
-            </a>
+            </Link>
           </div>
         </div>
       </nav>
@@ -445,9 +462,9 @@ Candidate background and fit: ${skills}`,
             <a href="#tools" className="cta-btn-primary">
               Start Free →
             </a>
-            <a href="#pricing" className="cta-btn-secondary">
+            <Link href="/pricing" className="cta-btn-secondary">
               View Pro Plans
-            </a>
+            </Link>
           </div>
         </div>
       </section>
@@ -468,7 +485,7 @@ Candidate background and fit: ${skills}`,
                   <a href="#features">Pro Features</a>
                 </li>
                 <li>
-                  <a href="#pricing">Pricing</a>
+                  <Link href="/pricing">Pricing</Link>
                 </li>
               </ul>
             </div>
