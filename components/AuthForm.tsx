@@ -6,7 +6,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   SMS_COOLDOWN_SEC,
   accountKind,
-  findUserByEmail,
   findUserByPhone,
   loadUsers,
   maskPhone,
@@ -19,7 +18,7 @@ import {
   verifySmsCode,
   type AuthMode,
 } from "@/lib/auth";
-import { fetchPublicConfig } from "@/lib/billing";
+import { supabase } from "@/lib/supabase";
 
 export type AuthFormProps = {
   initialMode?: AuthMode;
@@ -43,7 +42,6 @@ export default function AuthForm({
   const [formError, setFormError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
-  const [googleClientId, setGoogleClientId] = useState("");
   const [smsLeft, setSmsLeft] = useState(0);
   const smsTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -55,9 +53,6 @@ export default function AuthForm({
   }, [initialModeProp]);
 
   useEffect(() => {
-    fetchPublicConfig().then((c) => {
-      if (typeof c.googleClientId === "string") setGoogleClientId(c.googleClientId);
-    });
     return () => {
       if (smsTimer.current) clearInterval(smsTimer.current);
     };
@@ -77,99 +72,29 @@ export default function AuthForm({
     setFieldErrors((e) => ({ ...e, [key]: msg }));
   };
 
-  const completeGoogle = (profile: {
-    email: string;
-    sub?: string;
-    name?: string;
-  }) => {
-    const email = profile.email.trim().toLowerCase();
-    const users = loadUsers();
-    let user = users.find((u) => u.email === email || (profile.sub && u.googleId === profile.sub));
-    if (!user) {
-      user = {
-        email,
-        googleId: profile.sub || null,
-        name: profile.name || "",
-        provider: "google",
-      };
-      users.push(user);
-      saveUsers(users);
-    } else if (!user.googleId && profile.sub) {
-      user.googleId = profile.sub;
-      user.provider = "google";
-      saveUsers(users);
-    }
-    setSession({
-      type: "google",
-      identifier: email,
-      displayName: profile.name || email.split("@")[0],
-    });
-    finishAuth();
-  };
-
   const signInWithGoogle = async () => {
     clearErrors();
-    if (!googleClientId) {
-      const email = prompt(
-        "Demo mode: enter your Gmail address (set GOOGLE_CLIENT_ID in .env.local for one-click sign-in)",
-        "you@gmail.com"
-      );
-      if (!email) return;
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-        setFormError("Enter a valid email address");
-        return;
-      }
-      completeGoogle({ email: email.trim(), sub: "demo_" + email, name: email.split("@")[0] });
-      return;
-    }
-
+    setSubmitting(true);
     try {
-      await loadGoogleScript();
-      const g = window.google;
-      if (!g?.accounts?.oauth2) throw new Error("Google SDK unavailable");
-
-      g.accounts.oauth2
-        .initTokenClient({
-          client_id: googleClientId,
-          scope: "openid email profile",
-          callback: async (tokenResponse: { error?: string; access_token?: string }) => {
-            if (tokenResponse.error) {
-              setFormError("Google authorization failed");
-              return;
-            }
-            try {
-              const res = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
-                headers: { Authorization: "Bearer " + tokenResponse.access_token },
-              });
-              if (!res.ok) throw new Error("userinfo");
-              const data = await res.json();
-              completeGoogle({
-                email: data.email,
-                sub: data.sub,
-                name: data.name,
-              });
-            } catch {
-              setFormError("Google sign-in failed. Please try again.");
-            }
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: "offline",
+            prompt: mode === "register" ? "consent" : "select_account",
           },
-        })
-        .requestAccessToken({ prompt: mode === "register" ? "consent" : "" });
+        },
+      });
+      if (error) {
+        setFormError("Google 登录失败：" + error.message);
+        setSubmitting(false);
+      }
     } catch {
-      setFormError("Could not load Google sign-in");
+      setFormError("无法启动 Google 登录，请检查 Supabase 是否已启用 Google Provider");
+      setSubmitting(false);
     }
   };
-
-  function loadGoogleScript(): Promise<void> {
-    if (window.google?.accounts) return Promise.resolve();
-    return new Promise((resolve, reject) => {
-      const s = document.createElement("script");
-      s.src = "https://accounts.google.com/gsi/client";
-      s.async = true;
-      s.onload = () => resolve();
-      s.onerror = () => reject(new Error("script"));
-      document.head.appendChild(s);
-    });
-  }
 
   const sendSms = () => {
     const err = validateAccount(account);
@@ -193,83 +118,122 @@ export default function AuthForm({
     }, 1000);
   };
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("[AuthForm] 表单提交", { mode, account, passwordLen: password.length });
     clearErrors();
     const acc = account.trim();
     const k = accountKind(acc);
     const aErr = validateAccount(acc);
     if (aErr) setField("account", aErr);
-    if (!k) return;
+    if (!k) {
+      console.warn("[AuthForm] 账号格式无效，停止提交", { account: acc, aErr });
+      return;
+    }
 
-    if (k === "phone") {
-      const cErr = validateCode(phoneCode);
-      if (cErr) setField("phoneCode", cErr);
-      if (aErr || cErr) return;
-      if (!verifySmsCode(acc, phoneCode)) {
-        setFormError("Invalid or expired verification code");
-        return;
-      }
-      const users = loadUsers();
-      if (mode === "login") {
-        const user = findUserByPhone(acc);
-        if (!user) {
-          setFormError("This phone number is not registered yet");
+    setSubmitting(true);
+    try {
+      if (k === "phone") {
+        const cErr = validateCode(phoneCode);
+        if (cErr) setField("phoneCode", cErr);
+        if (aErr || cErr) return;
+        if (!verifySmsCode(acc, phoneCode)) {
+          setFormError("Invalid or expired verification code");
           return;
         }
-        setSession({
-          type: "phone",
-          identifier: user.phone!,
-          displayName: maskPhone(user.phone!),
-        });
+        const users = loadUsers();
+        if (mode === "login") {
+          const user = findUserByPhone(acc);
+          if (!user) {
+            setFormError("This phone number is not registered yet");
+            return;
+          }
+          setSession({
+            type: "phone",
+            identifier: user.phone!,
+            displayName: maskPhone(user.phone!),
+          });
+        } else {
+          const pErr = validatePassword(password);
+          if (pErr) setField("password", pErr);
+          if (password !== confirm) setField("confirm", "Passwords do not match");
+          if (pErr || password !== confirm) return;
+          if (users.some((u) => u.phone === acc)) {
+            setFormError("This phone number is already registered");
+            return;
+          }
+          users.push({ phone: acc, password });
+          saveUsers(users);
+          setSession({ type: "phone", identifier: acc, displayName: maskPhone(acc) });
+        }
       } else {
         const pErr = validatePassword(password);
         if (pErr) setField("password", pErr);
-        if (password !== confirm) setField("confirm", "Passwords do not match");
-        if (pErr || password !== confirm) return;
-        if (users.some((u) => u.phone === acc)) {
-          setFormError("This phone number is already registered");
+        if (mode === "register") {
+          if (!confirm) setField("confirm", "Confirm your password");
+          else if (confirm !== password) setField("confirm", "Passwords do not match");
+        }
+        if (aErr || pErr) {
+          console.warn("[AuthForm] 校验未通过", { aErr, pErr });
           return;
         }
-        users.push({ phone: acc, password });
-        saveUsers(users);
-        setSession({ type: "phone", identifier: acc, displayName: maskPhone(acc) });
-      }
-    } else {
-      const pErr = validatePassword(password);
-      if (pErr) setField("password", pErr);
-      if (mode === "register") {
-        if (!confirm) setField("confirm", "Confirm your password");
-        else if (confirm !== password) setField("confirm", "Passwords do not match");
-      }
-      if (aErr || pErr) return;
-      if (mode === "register" && (!confirm || confirm !== password)) return;
+        if (mode === "register" && (!confirm || confirm !== password)) {
+          console.warn("[AuthForm] 确认密码未通过", { hasConfirm: !!confirm });
+          return;
+        }
 
-      const email = acc.toLowerCase();
-      const users = loadUsers();
-      if (mode === "login") {
-        const user = findUserByEmail(email);
-        if (!user || user.password !== password) {
-          setFormError(
-            user?.provider === "google"
-              ? "Sign in with Google for this email"
-              : "Incorrect email or password"
-          );
-          return;
+        const email = acc.toLowerCase();
+
+        if (mode === "login") {
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+          console.log("登录结果：", data, error);
+          if (error) {
+            setFormError("登录失败：" + error.message);
+            console.error("登录错误详情：", error);
+            return;
+          }
+          setSession({
+            type: "email",
+            identifier: email,
+            displayName: data.user?.email ?? email,
+          });
+        } else {
+          console.log("开始注册...", email, password);
+          const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              emailRedirectTo: `${window.location.origin}/auth/callback`,
+            },
+          });
+          console.log("注册结果：", data, error);
+          if (error) {
+            setFormError("注册失败：" + error.message);
+            console.error("注册错误详情：", error);
+            return;
+          }
+          if (!data.user) {
+            setFormError("注册请求已发送，请检查邮箱验证链接");
+            return;
+          }
+          setSession({
+            type: "email",
+            identifier: email,
+            displayName: data.user.email ?? email,
+          });
         }
-        setSession({ type: "email", identifier: user.email!, displayName: user.email! });
-      } else {
-        if (users.some((u) => u.email === email)) {
-          setFormError("This email is already registered");
-          return;
-        }
-        users.push({ email, password });
-        saveUsers(users);
-        setSession({ type: "email", identifier: email, displayName: email });
       }
+
+      finishAuth();
+    } catch (err) {
+      console.error("认证异常：", err);
+      setFormError("认证异常：" + String(err));
+    } finally {
+      setSubmitting(false);
     }
-
-    finishAuth();
   };
 
   const isRegister = mode === "register";
@@ -460,20 +424,4 @@ function GoogleIcon() {
       />
     </svg>
   );
-}
-
-declare global {
-  interface Window {
-    google?: {
-      accounts: {
-        oauth2: {
-          initTokenClient: (config: {
-            client_id: string;
-            scope: string;
-            callback: (response: { error?: string; access_token?: string }) => void;
-          }) => { requestAccessToken: (opts?: { prompt?: string }) => void };
-        };
-      };
-    };
-  }
 }
