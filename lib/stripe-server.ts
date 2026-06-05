@@ -1,4 +1,5 @@
 import Stripe from "stripe";
+import { getAppUrlFromRequest } from "@/lib/app-url";
 
 export function stripeEnabled() {
   return !!(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_PRICE_ID);
@@ -15,8 +16,5 @@ export function getStripe(): Stripe | null {
 }
 
 export function getBaseUrl(req: Request): string {
-  if (process.env.APP_URL) return process.env.APP_URL.replace(/\/$/, "");
-  const host = req.headers.get("x-forwarded-host") || req.headers.get("host");
-  const proto = req.headers.get("x-forwarded-proto") || "http";
-  return `${proto}://${host}`;
+  return getAppUrlFromRequest(req);
 }

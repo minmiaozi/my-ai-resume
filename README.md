@@ -14,7 +14,7 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open the app at your configured `NEXT_PUBLIC_APP_URL` (e.g. set `NEXT_PUBLIC_APP_URL=http://localhost:3000` in `.env.local` for local dev).
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 

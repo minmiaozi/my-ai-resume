@@ -1,4 +1,5 @@
 import { assistantTextFromPayload } from "@/lib/completion";
+import { BULLET_SYSTEM_PROMPT, languageInstruction } from "@/lib/prompt-language";
 
 type Body = {
   messages?: Array<{ role: string; content: string }>;
@@ -21,10 +22,16 @@ export async function POST(request: Request) {
 
     let messages = body.messages;
     if (!messages?.length && body.jobTitle && body.experience) {
+      const job = body.jobTitle;
+      const exp = body.experience;
       messages = [
         {
+          role: "system",
+          content: `${BULLET_SYSTEM_PROMPT}\n\n${languageInstruction(job, exp)}`,
+        },
+        {
           role: "user",
-          content: `请把以下工作经验，优化成专业的英文简历要点，目标岗位：${body.jobTitle}\n工作内容：${body.experience}`,
+          content: `Target job title: ${job}\nWork experience:\n${exp}`,
         },
       ];
     }

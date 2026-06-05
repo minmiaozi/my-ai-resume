@@ -5,6 +5,11 @@ import { useEffect, useState } from "react";
 import NavAuth from "@/components/NavAuth";
 import { canGenerate, incrementUsage } from "@/lib/billing";
 import { assistantTextFromPayload } from "@/lib/completion";
+import {
+  BULLET_SYSTEM_PROMPT,
+  COVER_SYSTEM_PROMPT,
+  languageInstruction,
+} from "@/lib/prompt-language";
 
 async function parseApiJson(res: Response): Promise<Record<string, unknown>> {
   try {
@@ -86,12 +91,11 @@ export default function Home() {
           messages: [
             {
               role: "system",
-              content:
-                "你是专业的简历优化师，把用户的经历改成专业、简洁、适合投递的简历要点。",
+              content: `${BULLET_SYSTEM_PROMPT}\n\n${languageInstruction(job, content)}`,
             },
             {
               role: "user",
-              content: `求职岗位：${job}，经历：${content}`,
+              content: `Target job title: ${job}\nWork experience:\n${content}`,
             },
           ],
         }),
@@ -145,15 +149,11 @@ export default function Home() {
           messages: [
             {
               role: "system",
-              content:
-                "You are a professional career writer who writes clear, compelling cover letters for international job applications.",
+              content: `${COVER_SYSTEM_PROMPT}\n\n${languageInstruction(company, position, skills)}`,
             },
             {
               role: "user",
-              content: `Write a professional cover letter in English for the following:
-Company: ${company}
-Position: ${position}
-Candidate background and fit: ${skills}`,
+              content: `Company: ${company}\nPosition: ${position}\nCandidate background and fit:\n${skills}`,
             },
           ],
         }),

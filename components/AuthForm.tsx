@@ -19,6 +19,7 @@ import {
   type AuthMode,
 } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
+import { appUrl } from "@/lib/app-url";
 
 export type AuthFormProps = {
   initialMode?: AuthMode;
@@ -79,7 +80,7 @@ export default function AuthForm({
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: appUrl("/auth/callback"),
           queryParams: {
             access_type: "offline",
             prompt: mode === "register" ? "consent" : "select_account",
@@ -206,7 +207,7 @@ export default function AuthForm({
             email,
             password,
             options: {
-              emailRedirectTo: `${window.location.origin}/auth/callback`,
+              emailRedirectTo: appUrl("/auth/callback"),
             },
           });
           console.log("注册结果：", data, error);
