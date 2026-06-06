@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://airesumely.com/sitemap.xml
