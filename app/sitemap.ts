@@ -1,21 +1,20 @@
-// app/sitemap.ts
-import type { MetadataRoute } from 'next'
+import type { MetadataRoute } from "next";
+import { getAppUrl } from "@/lib/app-url";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return [
-    {
-      url: 'https://airesumely.com',
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1,
-    },
-    {
-      url: 'https://airesumely.com/create',
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    // 在这里继续补充你所有页面路由
-    // {url:'https://airesumely.com/xxx', lastModified:new Date()}
-  ]
+  const base = getAppUrl() || "https://www.airesumely.com";
+  const now = new Date();
+
+  const paths = [
+    { path: "", changeFrequency: "daily" as const, priority: 1 },
+    { path: "/pricing", changeFrequency: "weekly" as const, priority: 0.9 },
+    { path: "/pay", changeFrequency: "monthly" as const, priority: 0.5 },
+  ];
+
+  return paths.map(({ path, changeFrequency, priority }) => ({
+    url: `${base}${path}`,
+    lastModified: now,
+    changeFrequency,
+    priority,
+  }));
 }
