@@ -1,0 +1,134 @@
+{
+  "homepage": {
+    "nav": {
+      "brand": "ResumeAIPro",
+      "tools": "Tools",
+      "features": "Features",
+      "pricing": "Pricing",
+      "blog": "Blog",
+      "signIn": "Sign in",
+      "signUp": "Sign up",
+      "getPro": "Get Pro →"
+    },
+    "hero": {
+      "title": "AI-Powered Resume & Cover Letter Builder to Land Your Dream Job",
+      "subtitle": "Instantly generate recruiter-approved, experience-tailored resume bullets and professional cover letters without rigid templates"
+    },
+    "stats": {
+      "jobSeekersValue": "50K+",
+      "jobSeekersLabel": "Job seekers helped",
+      "satisfactionValue": "4.9/5",
+      "satisfactionLabel": "User satisfaction",
+      "generationTimeValue": "<10s",
+      "generationTimeLabel": "Average generation time"
+    },
+    "tool": {
+      "experienceLabel": "Paste Your Work & Experience Details",
+      "experiencePlaceholder": "Paste your full work history, skills, education, and core achievements here...",
+      "tailorHeading": "Tailor For Your Target Role",
+      "jobTitleLabel": "Target Job Title",
+      "jobTitlePlaceholder": "e.g. Software Engineer, Product Manager",
+      "industryLabel": "Target Industry (Optional)",
+      "industries": {
+        "technology": "Technology",
+        "marketing": "Marketing",
+        "finance": "Finance",
+        "healthcare": "Healthcare",
+        "operations": "Operations",
+        "general": "General"
+      },
+      "jobDescriptionLabel": "Target Job Description (Optional)",
+      "jobDescriptionPlaceholder": "Optional: Paste target job description for hyper-customized ATS-friendly resume content",
+      "companyLabel": "Company Name (Optional, for cover letter)",
+      "companyPlaceholder": "e.g. Google, Amazon",
+      "ctaButton": "Generate My Resume & Cover Letter",
+      "generating": "Generating your ATS-friendly content…",
+      "progressHint": "Usually finishes in under 10 seconds"
+    },
+    "toolsSection": {
+      "title": "Start Creating in Seconds",
+      "subtitle": "Two powerful tools, zero learning curve. Just paste your details and let AI do the heavy lifting."
+    },
+    "output": {
+      "previewTitle": "AI Output Preview",
+      "bulletsTab": "Resume Bullets",
+      "coverTab": "Cover Letter",
+      "recentTitle": "Recent Tasks",
+      "recentEmpty": "Your recent generations will appear here.",
+      "inspirationTitle": "Sample Inspiration",
+      "inspirationText": "• Led cross-functional launches that increased qualified pipeline by 34%\n• Built ATS-friendly resume workflows used by 50K+ job seekers\n• Partnered with hiring managers to refine bullet prompts for recruiter appeal",
+      "copy": "Copy",
+      "copied": "Copied",
+      "regenerate": "Regenerate",
+      "exportPdf": "Export PDF (Pro)",
+      "exportWord": "Export Word (Pro)",
+      "emptyPreview": "Paste your experience on the left and click generate to preview resume bullets and a cover letter here.",
+      "coverWaiting": "Waiting for cover letter…"
+    },
+    "about": {
+      "title": "What is ResumeAIPro?",
+      "body": "ResumeAIPro is a dedicated AI resume generator and AI cover letter maker built solely for job hunters worldwide. Generic template resumes get filtered out by ATS systems and ignored by recruiters every day. Our tool builds fully personalized resume bullet points and refined cover letters that align perfectly with your unique career history and the exact requirements of your desired roles."
+    },
+    "whyChoose": {
+      "title": "Why Choose Us?",
+      "item1": "Proven trust: 50,000+ job seekers rely on our AI resume generator, with a 4.9/5 user satisfaction score",
+      "item2": "Blazing-fast speed: Custom ATS-friendly resume and cover letter drafts finish generating in under 10 seconds",
+      "item3": "Zero restrictive templates: Every sentence is original, written specifically around your personal experience instead of copy-paste frameworks",
+      "item4": "Recruiter & ATS optimized: All output follows hiring manager standards and passes automated resume screening software"
+    },
+    "howItWorks": {
+      "title": "How It Works in 3 Simple Steps",
+      "step1": "Paste your full work history, hard/soft skills, education and core experience into the main input field",
+      "step2": "(Optional) Insert the target job posting text to let our AI cover letter maker tailor content to match role expectations",
+      "step3": "Tap the generate button, review your polished AI resume and cover letter, then copy text or download files for immediate job applications"
+    },
+    "gallery": {
+      "title": "See the Magic in Action",
+      "body": "Browse real before-and-after comparisons of generic template resumes transformed into high-converting ATS-friendly resumes built by our AI resume generator. View sample tailored cover letters, read success testimonials from 50K+ hired users, and explore 5-star user reviews highlighting faster interview callbacks and smoother job applications powered by ResumeAIPro.",
+      "comparisonBeforeLabel": "Template Resume (Before)",
+      "comparisonAfterLabel": "AI Resume Generator (After)",
+      "comparisonBefore": "• Responsible for managing projects\n• Worked with team on software\n• Helped improve processes",
+      "comparisonAfter": "• Led 4 cross-functional product launches, delivering $2.1M ARR within 12 months\n• Architected scalable React/Node services, reducing page load time by 38%\n• Standardized agile workflows, cutting sprint cycle time from 3 weeks to 10 days",
+      "coverSampleLabel": "AI Cover Letter Maker — Sample Opening",
+      "coverSampleText": "Dear Hiring Manager,\n\nI'm excited to apply for the Product Manager role at your company. With 6 years leading B2B SaaS roadmaps and a track record of launching features that increased retention by 22%, I can help your team ship customer-backed products faster.",
+      "testimonials": {
+        "sarahQuote": "Got 3 interview callbacks in the first week after updating my bullets.",
+        "sarahAuthor": "Sarah M.",
+        "sarahRole": "Marketing Manager",
+        "jamesQuote": "The cover letter tool saved me hours and finally sounded like me—not a template.",
+        "jamesAuthor": "James L.",
+        "jamesRole": "Software Engineer",
+        "priyaQuote": "Passed ATS screening for roles I used to get auto-rejected on. Huge win.",
+        "priyaAuthor": "Priya K.",
+        "priyaRole": "Operations Lead"
+      }
+    },
+    "faq": {
+      "title": "FAQ",
+      "q1": "Is ResumeAIPro free to try?",
+      "a1": "Yes. Start free with daily generations—no sign-up required for your first resume bullets and cover letter drafts.",
+      "q2": "Are outputs ATS-friendly?",
+      "a2": "Yes. Our AI resume generator formats bullets and cover letters to pass common applicant tracking systems while staying readable for recruiters.",
+      "q3": "Can I export to PDF or Word?",
+      "a3": "Copy is free on all plans. PDF and Word export are available on Pro.",
+      "q4": "What is your refund policy?",
+      "a4": "Pro subscriptions can be cancelled anytime. Contact hello@airesumely.com within 7 days of purchase if you need billing support."
+    },
+    "cta": {
+      "title": "Ready to Land More Interviews?",
+      "subtitle": "Join 50,000+ job seekers using our AI resume generator and cover letter maker.",
+      "primary": "Start Free",
+      "secondary": "View Pro Plans"
+    },
+    "footer": {
+      "faq": "FAQ",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "cookie": "Cookie Policy",
+      "refund": "Refund Policy",
+      "contact": "Contact Support",
+      "blog": "Blog",
+      "copyright": "© 2026 ResumeAIPro (airesumely.com). All rights reserved."
+    }
+  }
+}

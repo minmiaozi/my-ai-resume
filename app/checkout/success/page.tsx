@@ -53,7 +53,7 @@ function CheckoutSuccessContent() {
               account.
             </p>
             <div className="checkout-actions">
-              <Link href="/#tools" className="checkout-btn checkout-btn-primary">
+              <Link href="/#tool-console" className="checkout-btn checkout-btn-primary">
                 Start creating
               </Link>
               <Link href="/pricing" className="checkout-btn checkout-btn-secondary">

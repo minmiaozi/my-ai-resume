@@ -29,28 +29,28 @@ export default function AuthPageClient() {
   let isSuccess = false
 
   if (verified === '1') {
-    message = '邮箱验证成功！现在可以登录了。'
+    message = 'Your email has been verified. You can sign in now.'
     isSuccess = true
   } else if (error === 'verify_failed') {
-    message = '邮箱验证失败，请重新注册或重新发送验证邮件。'
+    message = 'Email verification failed. Please register again or request a new link.'
   } else if (error === 'missing_code') {
-    message = '验证链接无效，请用 Chrome/Safari 重新打开邮件中的链接。'
+    message = 'This verification link is invalid. Open the link from your email in Chrome or Safari.'
   }
 
   return (
     <div className="auth-page">
       <div className="auth-card" style={{ textAlign: 'center', padding: '32px 24px' }}>
-        <h1 className="auth-title">{isSuccess ? '验证成功' : '验证失败'}</h1>
+        <h1 className="auth-title">{isSuccess ? 'Verification successful' : 'Verification failed'}</h1>
         <p style={{ margin: '16px 0', color: isSuccess ? '#15803d' : '#dc2626' }}>{message}</p>
         <button
           type="button"
           className="auth-submit"
           onClick={() => openAuth('login')}
         >
-          去登录
+          Sign in
         </button>
         <p style={{ marginTop: 16 }}>
-          <Link href="/">返回首页</Link>
+          <Link href="/">Back to home</Link>
         </p>
       </div>
     </div>

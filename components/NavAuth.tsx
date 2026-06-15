@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/components/AuthProvider";
 import { getSession, setSession, type Session } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
@@ -25,6 +26,7 @@ function sessionFromSupabaseUser(user: {
 }
 
 export default function NavAuth() {
+  const t = useTranslations("homepage.nav");
   const { openAuth } = useAuth();
   const [session, setLocalSession] = useState<Session | null>(null);
 
@@ -87,14 +89,14 @@ export default function NavAuth() {
   return (
     <div className="nav-auth">
       <button type="button" className="nav-auth-btn" onClick={() => openAuth("login")}>
-        Sign in
+        {t("signIn")}
       </button>
       <button
         type="button"
         className="nav-auth-btn nav-auth-btn-primary"
         onClick={() => openAuth("register")}
       >
-        Sign up
+        {t("signUp")}
       </button>
     </div>
   );

@@ -1,4 +1,9 @@
-User-Agent: *
+User-agent: *
 Allow: /
+
+Disallow: /api/
+Disallow: /create-order
+Disallow: /auth/callback
+Disallow: /checkout/
 
 Sitemap: https://www.airesumely.com/sitemap.xml

@@ -43,7 +43,7 @@ export default function PricingPage() {
             ResumeAIPro
           </Link>
           <div className="nav-links">
-            <Link href="/#tools" className="nav-link">
+            <Link href="/#tool-console" className="nav-link">
               Tools
             </Link>
             <Link href="/pricing" className="nav-link">
@@ -102,7 +102,7 @@ export default function PricingPage() {
                 <li className="disabled">Job description matching</li>
                 <li className="disabled">Ad-free experience</li>
               </ul>
-              <Link href="/#tools" className="pricing-cta btn-free">
+              <Link href="/#tool-console" className="pricing-cta btn-free">
                 Get Started Free
               </Link>
             </div>

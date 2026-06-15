@@ -1,6 +1,85 @@
 @import "tailwindcss";
-@import "./resumeaipro.css";
 
 html {
-  color-scheme: light;
+  color-scheme: light dark;
+}
+
+/* Site-wide cookie consent banner */
+.cookie-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  padding: 16px 20px;
+  background: rgba(26, 26, 26, 0.97);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  color: #e5e7eb;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.cookie-banner-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.cookie-banner p {
+  margin: 0;
+  flex: 1 1 280px;
+}
+
+.cookie-banner a {
+  color: #3b82f6;
+  text-decoration: underline;
+}
+
+.cookie-banner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.cookie-btn {
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: opacity 0.2s;
+}
+
+.cookie-btn:hover {
+  opacity: 0.9;
+}
+
+.cookie-btn-primary {
+  background: #fbbf24;
+  color: #1a1a1a;
+  border-color: #fbbf24;
+}
+
+.cookie-btn-secondary {
+  background: transparent;
+  color: #e5e7eb;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 640px) {
+  .cookie-banner-actions {
+    width: 100%;
+  }
+
+  .cookie-btn {
+    flex: 1;
+    text-align: center;
+  }
 }
