@@ -8,12 +8,14 @@
     "postbuild": "tsx scripts/generate-sitemaps.ts",
     "sitemap": "tsx scripts/generate-sitemaps.ts",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "cf:deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {
     "@stripe/react-stripe-js": "^6.4.0",
     "@stripe/stripe-js": "^9.6.0",
     "@supabase/supabase-js": "^2.106.1",
+    "creem": "^1.4.5",
     "next": "16.2.6",
     "next-intl": "^4.13.0",
     "react": "19.2.4",
@@ -31,4 +33,5 @@
     "tsx": "^4.20.3",
     "typescript": "^5"
   }
+
 }

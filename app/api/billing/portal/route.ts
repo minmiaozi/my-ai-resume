@@ -1,9 +1,9 @@
-import { getBaseUrl, getStripe } from "@/lib/stripe-server";
+import { creemEnabled, getCreem } from "@/lib/creem-server";
 
 export async function POST(req: Request) {
   try {
-    const stripe = getStripe();
-    if (!stripe) {
+    const creem = getCreem();
+    if (!creem) {
       return Response.json({ demo: true });
     }
 
@@ -16,21 +16,29 @@ export async function POST(req: Request) {
       );
     }
 
-    const customers = await stripe.customers.list({ email, limit: 1 });
-    if (!customers.data.length) {
-      return Response.json({ error: "No billing account found for this email" }, { status: 404 });
-    }
-
-    const portal = await stripe.billingPortal.sessions.create({
-      customer: customers.data[0].id,
-      return_url: `${getBaseUrl(req)}/pricing`,
+    const customer = await creem.customers.retrieve(undefined, email);
+    const portal = await creem.customers.generateBillingLinks({
+      customerId: customer.id,
     });
 
-    return Response.json({ url: portal.url });
+    const url = portal.customerPortalLink;
+    if (!url) {
+      throw new Error("Creem did not return a customer portal link");
+    }
+
+    return Response.json({ url, customerPortalLink: url });
   } catch (error) {
     console.error("Billing portal error:", error);
     const message =
       error instanceof Error ? error.message : "Failed to open billing portal";
     return Response.json({ error: message }, { status: 500 });
   }
+}
+
+export async function GET() {
+  return Response.json({
+    paymentsEnabled: creemEnabled(),
+    provider: "creem",
+    hint: "POST with { email } to open the Creem customer portal",
+  });
 }

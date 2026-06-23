@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import NavAuth from "@/components/NavAuth";
+import { useCreemCheckout } from "@/hooks/useCreemCheckout";
 
 export function HomeNav() {
   const t = useTranslations("homepage.nav");
+  const { checkout, loading } = useCreemCheckout();
 
   return (
     <nav className="home-nav" aria-label="Main navigation">
@@ -31,9 +33,14 @@ export function HomeNav() {
           </Link>
           <div className="home-nav-actions">
             <NavAuth />
-            <Link href="/pricing" className="home-get-pro">
-              {t("getPro")}
-            </Link>
+            <button
+              type="button"
+              className="home-get-pro"
+              onClick={() => void checkout()}
+              disabled={loading}
+            >
+              {loading ? "Loading…" : t("getPro")}
+            </button>
           </div>
         </div>
       </div>

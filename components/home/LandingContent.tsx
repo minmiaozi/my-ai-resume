@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { useCreemCheckout } from "@/hooks/useCreemCheckout";
 
 const WHY_CHOOSE_KEYS = ["item1", "item2", "item3", "item4"] as const;
 const HOW_IT_WORKS_KEYS = ["step1", "step2", "step3"] as const;
@@ -15,6 +16,7 @@ const TESTIMONIALS = [
 
 export function LandingContent() {
   const t = useTranslations("homepage");
+  const { checkout, loading } = useCreemCheckout();
 
   return (
     <>
@@ -130,9 +132,14 @@ export function LandingContent() {
           <a href="#tool-console" className="home-cta-primary">
             {t("cta.primary")}
           </a>
-          <Link href="/pricing" className="home-cta-secondary">
-            {t("cta.secondary")}
-          </Link>
+          <button
+            type="button"
+            className="home-cta-secondary"
+            onClick={() => void checkout()}
+            disabled={loading}
+          >
+            {loading ? "Loading…" : t("cta.secondary")}
+          </button>
         </div>
       </section>
 

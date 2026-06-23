@@ -11,7 +11,7 @@ function CheckoutSuccessContent() {
   const [errorMsg, setErrorMsg] = useState("We couldn't verify your payment.");
 
   useEffect(() => {
-    const sessionId = searchParams.get("session_id");
+    const checkoutId = searchParams.get("checkout_id") || searchParams.get("session_id");
     const isDemo = searchParams.get("demo") === "1";
 
     (async () => {
@@ -20,12 +20,12 @@ function CheckoutSuccessContent() {
           setState("success");
           return;
         }
-        if (!sessionId) {
+        if (!checkoutId) {
           setErrorMsg("Missing checkout session. Please try again from the pricing page.");
           setState("error");
           return;
         }
-        await verifyCheckoutSession(sessionId);
+        await verifyCheckoutSession(checkoutId);
         setState("success");
       } catch (err) {
         setErrorMsg(err instanceof Error ? err.message : "Verification failed.");

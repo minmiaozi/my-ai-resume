@@ -1,5 +1,7 @@
 import { getSession } from "./auth";
 
+export type BillingInterval = "monthly" | "quarterly" | "yearly";
+
 export const SUBSCRIPTION_KEY = "resumeaipro_subscription";
 export const USAGE_KEY = "resumeaipro_usage";
 export const FREE_DAILY_LIMIT = 10;
@@ -45,6 +47,11 @@ export function isPro() {
   if (sub.status === "active" || sub.status === "trialing") return true;
   if (sub.expiresAt && Date.now() < sub.expiresAt) return true;
   return false;
+}
+
+export function isDemoPro() {
+  const sub = getSubscription();
+  return Boolean(sub && sub.plan === "pro" && sub.source === "demo");
 }
 
 export function getUsage() {
@@ -116,7 +123,7 @@ export function activatePro(payload: {
     plan: "pro",
     status: payload.status || "active",
     email: payload.email || "",
-    source: payload.source || "stripe",
+    source: payload.source || "creem",
     sessionId: payload.sessionId ?? null,
     expiresAt: payload.expiresAt ?? null,
     updatedAt: Date.now(),
@@ -125,20 +132,22 @@ export function activatePro(payload: {
 
 export async function startCheckout(options?: {
   email?: string;
+  billing?: BillingInterval;
   onSuccess?: () => void;
 }) {
   const email = options?.email || getSessionEmail();
+  const billing = options?.billing || "monthly";
   const res = await fetch("/api/checkout/create", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email: email || undefined, plan: "pro" }),
+    body: JSON.stringify({ email: email || undefined, billing }),
   });
   const data = await parseJsonResponse(res);
   if (!res.ok) throw new Error((data.error as string) || "Checkout failed");
 
   if (data.demo) {
     const ok = confirm(
-      "Demo mode: simulate a successful Pro subscription?\n\nConfigure STRIPE_SECRET_KEY and STRIPE_PRICE_ID in .env.local for real payments."
+      "Demo mode: simulate a successful Pro subscription?\n\nConfigure CREEM_API_KEY and CREEM_PLAN_ID in .env.local for real payments."
     );
     if (!ok) return;
     activatePro({
@@ -152,6 +161,11 @@ export async function startCheckout(options?: {
     return;
   }
 
+  if (typeof data.checkoutUrl === "string") {
+    window.location.href = data.checkoutUrl;
+    return;
+  }
+
   if (typeof data.url === "string") {
     window.location.href = data.url;
     return;
@@ -159,16 +173,18 @@ export async function startCheckout(options?: {
   throw new Error("No checkout URL returned");
 }
 
-export async function verifyCheckoutSession(sessionId: string) {
-  const res = await fetch(`/api/checkout/verify?session_id=${encodeURIComponent(sessionId)}`);
+export async function verifyCheckoutSession(checkoutId: string) {
+  const res = await fetch(
+    `/api/checkout/verify?checkout_id=${encodeURIComponent(checkoutId)}`
+  );
   const data = await parseJsonResponse(res);
   if (!res.ok) throw new Error((data.error as string) || "Verification failed");
   if (data.active) {
     activatePro({
       status: (data.status as string) || "active",
       email: (data.email as string) || "",
-      source: data.demo ? "demo" : "stripe",
-      sessionId,
+      source: data.demo ? "demo" : "creem",
+      sessionId: checkoutId,
       expiresAt: (data.expiresAt as number) || null,
     });
   }
@@ -177,16 +193,27 @@ export async function verifyCheckoutSession(sessionId: string) {
 
 export async function openCustomerPortal() {
   const sub = getSubscription();
+  const email = sub?.email || getSessionEmail();
   const res = await fetch("/api/billing/portal", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email: sub?.email }),
+    body: JSON.stringify({ email: email || undefined }),
   });
   const data = await parseJsonResponse(res);
   if (data.demo) {
-    alert("Demo mode: subscription management requires Stripe configuration.");
+    alert("Demo mode: complete a real checkout first to manage billing in Creem.");
     return;
   }
-  if (typeof data.url === "string") window.location.href = data.url;
+  if (!res.ok) {
+    alert((data.error as string) || "Failed to open billing portal");
+    return;
+  }
+  const url =
+    typeof data.customerPortalLink === "string"
+      ? data.customerPortalLink
+      : typeof data.url === "string"
+        ? data.url
+        : null;
+  if (url) window.location.href = url;
   else if (data.error) alert(data.error as string);
 }

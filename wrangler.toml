@@ -1,0 +1,10 @@
+name = "ai-resume-pro"
+compatibility_date = "2026-06-23"
+main = ".next/standalone/server.js"
+
+[vars]
+NEXT_PUBLIC_CREEM_SUCCESS_URL = "https://www.airesumely.com/payment/success"
+CREEM_PLAN_ID = "prod_3rvBte2QL7FdD97clC5eMC"
+CREEM_JPLAN_ID = "prod_1RFLRJurnxjZnbaKTeg0Yd"
+CREEM_YPLAN_ID = "prod_21XUMiPqKhY9K04XD1gtH5"
+NEXT_PUBLIC_APP_URL = "https://www.airesumely.com"

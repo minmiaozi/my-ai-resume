@@ -8,6 +8,7 @@ const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
 const nextConfig: NextConfig = {
   // Monorepo-style lockfiles above this folder make Next pick the wrong root → 404 on /
+  output: "standalone",
   turbopack: {
     root: projectRoot,
   },

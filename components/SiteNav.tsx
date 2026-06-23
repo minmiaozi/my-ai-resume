@@ -2,12 +2,15 @@
 
 import Link from "next/link";
 import NavAuth from "@/components/NavAuth";
+import { useCreemCheckout } from "@/hooks/useCreemCheckout";
 
 type SiteNavProps = {
   scrolled?: boolean;
 };
 
 export default function SiteNav({ scrolled = true }: SiteNavProps) {
+  const { checkout, loading } = useCreemCheckout();
+
   return (
     <nav className={`navbar${scrolled ? " scrolled" : ""}`}>
       <div className="nav-container">
@@ -29,9 +32,14 @@ export default function SiteNav({ scrolled = true }: SiteNavProps) {
             Blog
           </Link>
           <NavAuth />
-          <Link href="/pricing" className="nav-cta">
-            Get Pro →
-          </Link>
+          <button
+            type="button"
+            className="nav-cta"
+            onClick={() => void checkout()}
+            disabled={loading}
+          >
+            {loading ? "Loading…" : "Get Pro →"}
+          </button>
         </div>
       </div>
     </nav>

@@ -1,14 +1,23 @@
-import { getStripe } from "@/lib/stripe-server";
+import { creemEnabled, getCreem } from "@/lib/creem-server";
+import type { CheckoutEntity } from "creem/models/components";
+
+function customerEmail(checkout: CheckoutEntity) {
+  if (checkout.customer && typeof checkout.customer === "object" && "email" in checkout.customer) {
+    return String(checkout.customer.email || "");
+  }
+  return "";
+}
 
 export async function GET(req: Request) {
   try {
-    const sessionId = new URL(req.url).searchParams.get("session_id");
-    if (!sessionId) {
-      return Response.json({ error: "session_id is required" }, { status: 400 });
+    const params = new URL(req.url).searchParams;
+    const checkoutId = params.get("checkout_id") || params.get("session_id");
+    if (!checkoutId) {
+      return Response.json({ error: "checkout_id is required" }, { status: 400 });
     }
 
-    const stripe = getStripe();
-    if (!stripe) {
+    const creem = getCreem();
+    if (!creem) {
       return Response.json({
         active: true,
         demo: true,
@@ -17,29 +26,20 @@ export async function GET(req: Request) {
       });
     }
 
-    const session = await stripe.checkout.sessions.retrieve(sessionId);
-    const paid =
-      session.payment_status === "paid" ||
-      session.status === "complete" ||
-      session.status === "open";
-
-    let subscriptionStatus = "active";
-    if (session.subscription) {
-      const subId =
-        typeof session.subscription === "string"
-          ? session.subscription
-          : session.subscription.id;
-      const sub = await stripe.subscriptions.retrieve(subId);
-      subscriptionStatus = sub.status;
-    }
-
-    const active = paid && ["active", "trialing"].includes(subscriptionStatus);
+    const checkout = await creem.checkouts.retrieve(checkoutId);
+    const status = String(checkout.status || "").toLowerCase();
+    const active = status === "completed" || Boolean(checkout.order);
 
     return Response.json({
       active,
-      status: subscriptionStatus,
-      email: session.customer_details?.email || session.customer_email || "",
-      sessionId,
+      status: checkout.status || (active ? "active" : "pending"),
+      email: customerEmail(checkout),
+      checkoutId,
+      orderId: checkout.order?.id || null,
+      subscriptionId:
+        typeof checkout.subscription === "string"
+          ? checkout.subscription
+          : checkout.subscription?.id || null,
     });
   } catch (error) {
     console.error("Checkout verify error:", error);

@@ -1,32 +1,54 @@
-import { getBaseUrl, getStripe, stripeEnabled } from "@/lib/stripe-server";
+import {
+  creemEnabled,
+  getCreem,
+  getCreemProductId,
+  getCreemSuccessUrl,
+  parseCreemBillingInterval,
+} from "@/lib/creem-server";
 
 export async function POST(req: Request) {
   try {
-    const stripe = getStripe();
-    if (!stripe) {
+    const creem = getCreem();
+    if (!creem) {
       return Response.json({ demo: true });
     }
 
-    const body = (await req.json().catch(() => ({}))) as { email?: string };
-    const base = getBaseUrl(req);
+    const body = (await req.json().catch(() => ({}))) as {
+      email?: string;
+      billing?: string;
+    };
     const email = body.email ? String(body.email).trim() : undefined;
+    const billing = parseCreemBillingInterval(body.billing);
+    const productId = getCreemProductId(billing);
 
-    const session = await stripe.checkout.sessions.create({
-      mode: "subscription",
-      payment_method_types: ["card"],
-      line_items: [{ price: process.env.STRIPE_PRICE_ID!, quantity: 1 }],
-      success_url: `${base}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${base}/pricing?canceled=1`,
-      customer_email: email || undefined,
-      allow_promotion_codes: true,
-      subscription_data: {
-        trial_period_days: process.env.STRIPE_TRIAL_DAYS
-          ? parseInt(process.env.STRIPE_TRIAL_DAYS, 10)
-          : 7,
+    if (!productId) {
+      return Response.json(
+        { error: `Creem product ID is not configured for ${billing} billing` },
+        { status: 400 }
+      );
+    }
+
+    const checkout = await creem.checkouts.create({
+      productId,
+      customer: email ? { email } : undefined,
+      successUrl: getCreemSuccessUrl(),
+      metadata: {
+        billing,
       },
     });
 
-    return Response.json({ url: session.url, sessionId: session.id });
+    const checkoutUrl = checkout.checkoutUrl;
+    if (!checkoutUrl) {
+      throw new Error("Creem did not return a checkout URL");
+    }
+
+    return Response.json({
+      checkoutUrl,
+      url: checkoutUrl,
+      checkoutId: checkout.id,
+      billing,
+      productId,
+    });
   } catch (error) {
     console.error("Checkout create error:", error);
     const message = error instanceof Error ? error.message : "Failed to start checkout";
@@ -36,7 +58,13 @@ export async function POST(req: Request) {
 
 export async function GET() {
   return Response.json({
-    paymentsEnabled: stripeEnabled(),
-    hint: "POST to create a checkout session",
+    paymentsEnabled: creemEnabled(),
+    provider: "creem",
+    plans: {
+      monthly: getCreemProductId("monthly"),
+      quarterly: getCreemProductId("quarterly"),
+      yearly: getCreemProductId("yearly"),
+    },
+    hint: "POST { email?, billing?: monthly|quarterly|yearly } to create a Creem checkout session",
   });
 }
