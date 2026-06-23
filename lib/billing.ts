@@ -147,7 +147,7 @@ export async function startCheckout(options?: {
 
   if (data.demo) {
     const ok = confirm(
-      "Demo mode: simulate a successful Pro subscription?\n\nConfigure CREEM_API_KEY and CREEM_PLAN_ID in .env.local for real payments."
+      "Demo mode: simulate a successful Pro subscription?\n\nFor local dev, set CREEM_API_KEY and CREEM_PLAN_ID in .env.local."
     );
     if (!ok) return;
     activatePro({

@@ -10,6 +10,15 @@ export async function POST(req: Request) {
   try {
     const creem = getCreem();
     if (!creem) {
+      if (process.env.NODE_ENV === "production") {
+        return Response.json(
+          {
+            error:
+              "Payments are not configured. Add CREEM_API_KEY, CREEM_PLAN_ID, CREEM_JPLAN_ID, and CREEM_YPLAN_ID in Vercel → Settings → Environment Variables (Production), then redeploy.",
+          },
+          { status: 503 }
+        );
+      }
       return Response.json({ demo: true });
     }
 
