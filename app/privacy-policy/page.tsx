@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import PageShell from "@/components/PageShell";
-import { pageMetadata } from "@/lib/site-metadata";
+import { AI_MODEL_DISCLOSURE, pageMetadata, SUPPORT_EMAIL } from "@/lib/site-metadata";
 
 export const metadata: Metadata = pageMetadata({
   title: "Privacy Policy",
@@ -35,7 +35,7 @@ export default function PrivacyPolicyPage() {
               and text you paste into our generators to create resume bullets and cover letters.
             </li>
             <li>
-              <strong>Payment data:</strong> processed by Stripe; we do not store full card
+              <strong>Payment data:</strong> processed by Creem; we do not store full card
               numbers.
             </li>
             <li>
@@ -62,6 +62,15 @@ export default function PrivacyPolicyPage() {
             generate your requested outputs.
           </p>
 
+          <h2>3a. AI Processing &amp; Model Disclosure</h2>
+          <p>{AI_MODEL_DISCLOSURE}</p>
+          <p>
+            When you use our generators, the text you submit (work history, job descriptions, and
+            related fields) is transmitted to Volcengine to produce resume bullets and cover
+            letters. We do not use your content to train public models. See Volcengine&apos;s
+            privacy documentation for how they handle API requests.
+          </p>
+
           <h2>4. Legal Bases (EEA/UK)</h2>
           <p>
             Where applicable, we rely on contract performance (providing the service), legitimate
@@ -72,7 +81,7 @@ export default function PrivacyPolicyPage() {
           <h2>5. International Transfers</h2>
           <p>
             We use providers that may process data in the United States and other countries
-            (including Supabase, Stripe, Google, and Vercel). Transfers use appropriate safeguards
+            (including Supabase, Creem, Volcengine, Google, and Vercel). Transfers use appropriate safeguards
             such as Standard Contractual Clauses where required.
           </p>
 
@@ -94,7 +103,7 @@ export default function PrivacyPolicyPage() {
           </ul>
           <p>
             To exercise rights, email{" "}
-            <a href="mailto:hello@airesumely.com">hello@airesumely.com</a>. We respond within 30
+            <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>. We respond within 30
             days where required by law.
           </p>
 
@@ -106,7 +115,7 @@ export default function PrivacyPolicyPage() {
 
           <h2>9. Contact</h2>
           <p>
-            Privacy inquiries: <a href="mailto:hello@airesumely.com">hello@airesumely.com</a>
+            Privacy inquiries: <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>
           </p>
         </div>
       </section>

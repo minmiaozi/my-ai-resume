@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import PageShell from "@/components/PageShell";
-import { pageMetadata } from "@/lib/site-metadata";
+import { pageMetadata, SUPPORT_EMAIL } from "@/lib/site-metadata";
 
 export const metadata: Metadata = pageMetadata({
   title: "Cookie Policy",
@@ -52,19 +52,19 @@ export default function CookiePolicyPage() {
           <p>
             When you first visit, our banner lets you <strong>Accept All</strong> cookies or{" "}
             <strong>Reject Non-Essential</strong> (essential cookies only). You can change your
-            mind by clearing site data in your browser or contacting hello@airesumely.com.
+            mind by clearing site data in your browser or contacting {SUPPORT_EMAIL}.
           </p>
 
           <h2>4. Third-Party Cookies</h2>
           <p>
             Third parties that may set cookies when consented or when using their features
-            include Google (AdSense/Analytics), Stripe (payments), Supabase (auth), and Vercel
+            include Google (AdSense/Analytics), Creem (payments), Supabase (auth), and Vercel
             (hosting). Their policies govern their use of data.
           </p>
 
           <h2>5. Contact</h2>
           <p>
-            Questions about cookies: <a href="mailto:hello@airesumely.com">hello@airesumely.com</a>
+            Questions about cookies: <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>
           </p>
         </div>
       </section>

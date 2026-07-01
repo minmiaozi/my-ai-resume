@@ -47,12 +47,12 @@ export function ToolInputPanel({
 
       <div className="stats-row" aria-label="Platform statistics">
         <div className="stat-item">
-          <div className="stat-value">{t("stats.jobSeekersValue")}</div>
-          <div className="stat-label">{t("stats.jobSeekersLabel")}</div>
+          <div className="stat-value">{t("stats.toolsValue")}</div>
+          <div className="stat-label">{t("stats.toolsLabel")}</div>
         </div>
         <div className="stat-item">
-          <div className="stat-value">{t("stats.satisfactionValue")}</div>
-          <div className="stat-label">{t("stats.satisfactionLabel")}</div>
+          <div className="stat-value">{t("stats.atsValue")}</div>
+          <div className="stat-label">{t("stats.atsLabel")}</div>
         </div>
         <div className="stat-item">
           <div className="stat-value">{t("stats.generationTimeValue")}</div>

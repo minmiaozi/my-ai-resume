@@ -1,4 +1,4 @@
-import { SITE_URL } from "@/lib/site-metadata";
+import { SITE_URL, SUPPORT_EMAIL } from "@/lib/site-metadata";
 
 export function websiteJsonLd() {
   return {
@@ -42,7 +42,7 @@ export function organizationJsonLd() {
     "@type": "Organization",
     name: "Airesumely",
     url: SITE_URL,
-    email: "hello@airesumely.com",
+    email: SUPPORT_EMAIL,
     logo: `${SITE_URL}/favicon.ico`,
   };
 }

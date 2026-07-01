@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import PageShell from "@/components/PageShell";
-import { pageMetadata } from "@/lib/site-metadata";
+import { AI_MODEL_DISCLOSURE, pageMetadata, SUPPORT_EMAIL } from "@/lib/site-metadata";
 
 export const metadata: Metadata = pageMetadata({
   title: "Terms of Service",
@@ -44,13 +44,13 @@ export default function TermsOfServicePage() {
 
           <h2>5. Subscriptions &amp; Refunds</h2>
           <p>
-            Pro plans are billed as shown at checkout (currently $7.99/month with a 7-day trial
-            where offered). You may cancel anytime via the billing portal. Refund requests within
-            7 days of charge may be considered by contacting hello@airesumely.com; see our FAQ for
+            Pro plans are billed at the price shown at checkout. You may cancel anytime via the billing portal. Refund requests within
+            7 days of charge may be considered by contacting {SUPPORT_EMAIL}; see our FAQ for
             summary. Free tier limits apply as displayed on the Pricing page.
           </p>
 
           <h2>6. AI Disclaimer</h2>
+          <p>{AI_MODEL_DISCLOSURE}</p>
           <p>
             AI-generated resume bullets and cover letters may contain errors. You are solely
             responsible for verifying accuracy and suitability before submitting materials to
@@ -73,8 +73,8 @@ export default function TermsOfServicePage() {
           <h2>9. Governing Law</h2>
           <p>
             These terms are governed by applicable laws in our principal place of business, without
-            regard to conflict-of-law rules. Disputes should first be raised at
-            hello@airesumely.com.
+            regard to conflict-of-law rules. Disputes should first be raised at{" "}
+            {SUPPORT_EMAIL}.
           </p>
 
           <h2>10. Changes</h2>
@@ -85,7 +85,7 @@ export default function TermsOfServicePage() {
 
           <h2>11. Contact</h2>
           <p>
-            Questions: <a href="mailto:hello@airesumely.com">hello@airesumely.com</a>
+            Questions: <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>
           </p>
         </div>
       </section>

@@ -5,6 +5,13 @@ export const SITE_URL =
   process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ||
   "https://www.airesumely.com";
 
+/** Must match the support email registered with Creem / payment provider. */
+export const SUPPORT_EMAIL = "junmin.miao@gmail.com";
+
+/** Public disclosure of the third-party AI model used for generation. */
+export const AI_MODEL_DISCLOSURE =
+  "Resume bullets and cover letters are generated using ByteDance Volcengine Doubao large language models via the Volcengine API.";
+
 export const DEFAULT_TITLE =
   "AI Resume & Cover Letter Generator | ATS-Friendly | Airesumely";
 export const DEFAULT_DESCRIPTION =

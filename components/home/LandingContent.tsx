@@ -3,16 +3,11 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useCreemCheckout } from "@/hooks/useCreemCheckout";
+import { SUPPORT_EMAIL } from "@/lib/site-metadata";
 
 const WHY_CHOOSE_KEYS = ["item1", "item2", "item3", "item4"] as const;
 const HOW_IT_WORKS_KEYS = ["step1", "step2", "step3"] as const;
-const FAQ_KEYS = ["1", "2", "3", "4"] as const;
-
-const TESTIMONIALS = [
-  { quote: "sarahQuote", author: "sarahAuthor", role: "sarahRole" },
-  { quote: "jamesQuote", author: "jamesAuthor", role: "jamesRole" },
-  { quote: "priyaQuote", author: "priyaAuthor", role: "priyaRole" },
-] as const;
+const FAQ_KEYS = ["1", "2", "3", "4", "5"] as const;
 
 export function LandingContent() {
   const t = useTranslations("homepage");
@@ -24,6 +19,7 @@ export function LandingContent() {
         <div className="home-section-inner">
           <h2>{t("about.title")}</h2>
           <p className="home-body-text">{t("about.body")}</p>
+          <p className="home-body-text home-ai-disclosure">{t("about.aiDisclosure")}</p>
         </div>
       </section>
 
@@ -39,12 +35,12 @@ export function LandingContent() {
           </div>
           <div className="stats-row" aria-label="Platform statistics">
             <div className="stat-item">
-              <div className="stat-value">{t("stats.jobSeekersValue")}</div>
-              <div className="stat-label">{t("stats.jobSeekersLabel")}</div>
+              <div className="stat-value">{t("stats.toolsValue")}</div>
+              <div className="stat-label">{t("stats.toolsLabel")}</div>
             </div>
             <div className="stat-item">
-              <div className="stat-value">{t("stats.satisfactionValue")}</div>
-              <div className="stat-label">{t("stats.satisfactionLabel")}</div>
+              <div className="stat-value">{t("stats.atsValue")}</div>
+              <div className="stat-label">{t("stats.atsLabel")}</div>
             </div>
             <div className="stat-item">
               <div className="stat-value">{t("stats.generationTimeValue")}</div>
@@ -90,24 +86,6 @@ export function LandingContent() {
             <div className="compare-label after">{t("gallery.coverSampleLabel")}</div>
             <pre>{t("gallery.coverSampleText")}</pre>
           </div>
-
-          <div className="testimonials-grid">
-            {TESTIMONIALS.map((item) => (
-              <blockquote className="testimonial-card" key={item.author}>
-                <p className="testimonial-quote">
-                  &ldquo;{t(`gallery.testimonials.${item.quote}`)}&rdquo;
-                </p>
-                <footer>
-                  <div className="testimonial-author">
-                    {t(`gallery.testimonials.${item.author}`)}
-                  </div>
-                  <div className="testimonial-role">
-                    {t(`gallery.testimonials.${item.role}`)}
-                  </div>
-                </footer>
-              </blockquote>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -150,10 +128,11 @@ export function LandingContent() {
           <Link href="/terms-of-service">{t("footer.terms")}</Link>
           <Link href="/cookie-policy">{t("footer.cookie")}</Link>
           <a href="#faq">{t("footer.refund")}</a>
-          <a href="mailto:hello@airesumely.com">{t("footer.contact")}</a>
+          <a href={`mailto:${SUPPORT_EMAIL}`}>{t("footer.contact")}</a>
           <Link href="/blog">{t("footer.blog")}</Link>
         </nav>
         <p className="home-footer-copy">{t("footer.copyright")}</p>
+        <p className="home-footer-copy">{t("footer.aiDisclosure")}</p>
       </footer>
     </>
   );

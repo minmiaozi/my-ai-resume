@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AI_MODEL_DISCLOSURE, SUPPORT_EMAIL } from "@/lib/site-metadata";
 
 export default function SiteFooter() {
   return (
@@ -52,7 +53,7 @@ export default function SiteFooter() {
                 <Link href="/cookie-policy">Cookie Policy</Link>
               </li>
               <li>
-                <a href="mailto:hello@airesumely.com">Contact</a>
+                <a href={`mailto:${SUPPORT_EMAIL}`}>Contact</a>
               </li>
             </ul>
           </div>
@@ -67,6 +68,10 @@ export default function SiteFooter() {
         </div>
         <div className="footer-bottom">
           <p>© 2026 Airesumely (ResumeAIPro). All rights reserved.</p>
+          <p className="footer-ai-disclosure">{AI_MODEL_DISCLOSURE}</p>
+          <p>
+            Support: <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>
+          </p>
         </div>
       </div>
     </footer>
